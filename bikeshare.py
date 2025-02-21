@@ -3,10 +3,6 @@ import pandas as pd
 import numpy as np
 import config
 
-CITY_DATA = { 'chicago': 'chicago.csv',
-              'new york city': 'new_york_city.csv',
-              'washington': 'washington.csv' }
-
 def check_valid_input(user_input, valid_answers, common_alternatives):
     """Checks if inputs are valid and coverts to alternatives if neccessary"""
     if user_input.lower() in valid_answers:
@@ -51,7 +47,6 @@ def get_user_inputs(input_type, valid_options):
             print(f"Invalid {input_type}. Please try again using valid options.")
 
     return inputs
-
 
 def find_indices_sublist(main_list, sublist):
     """Find indices of each unique item in the sublist within the main list."""
@@ -277,52 +272,57 @@ def get_filters():
 
 
 
-def load_data(city, month, day):
+def load_data(cities, months, days, CITY_DATA_FILES):
     """
     Loads data for the specified city and filters by month and day if applicable.
 
     Args:
-        (str) city - name of the city to analyze
+        (str) city - name of the city(ies) to analyze
         (str) month - name of the month(s) to filter by
         (str) day - name of the day(s) of week to filter by
     Returns:
         df - Pandas DataFrame containing city data filtered by month and day
     """
     # load data file into a dataframe
-    df = pd.read_csv(CITY_DATA[city])
+    dfs = []
+    for city in cities:
+        if city in CITY_DATA_FILES:
+            # load data from a city
+            df = pd.read_csv(CITY_DATA_FILES[city])
 
-
-    #view raw data
-    view_raw_df = input(f"\nWould you like to see the raw data from {city.title()} (Yes or No):\n").lower().strip()
-    if(view_raw_df in ['yes', 'y']):
-        print_dataframe_chunks(df)
+            # Handle missing gender and birth year data if Washington is selected
+            if city == 'Washington':
+                df['Gender'] = 'Unknown'
+                df['Birth Year'] = 'Unknown'
+            dfs.append(df)
 
     # convert the Start Time column to datetime
     df['Start Time'] = pd.to_datetime(df['Start Time'])
 
     # extract year, month, and day of week from Start Time to create new columns
     df['year'] = df['Start Time'].dt.year
-    df['month'] = df['Start Time'].dt.month
-    df['day_of_week'] = df['Start Time'].dt.weekday
+    df['month'] = df['Start Time'].dt.strftime('%B').str.lower()  # Use strftime('%B') for month names
+    df['day_of_week'] = df['Start Time'].dt.strftime('%A').str.lower()  # Use strftime('%A') for day names
+
 
     ## extract hour from the Start Time column to create an hour column
     df['hour'] = df['Start Time'].dt.hour
 
-    # use the index of the months list to get the corresponding int
-    months = ['january', 'february', 'march', 'april', 'may', 'june']
-    month = convert_to_1_based_indices(find_indices_sublist(months,month))
- 
-    # filter by month to create the new dataframe
-    df = df[df['month'].isin(month)]
+    # view raw data
+    view_raw_df = input(f"\nWould you like to see the raw data from {' AND '.join(str(c).title() for c in cities)} (Yes or No):\n").lower().strip()
+    if(view_raw_df in ['yes', 'y']):
+        print_dataframe_chunks(df)
 
-    # filter by day of week if applicable
-    days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
-    day = find_indices_sublist(days,day)
-    # filter by day of week to create the new dataframe
-    df = df[df['day_of_week'].isin(day)]
+    ## filter selected months
+    if months:
+        df = df[df['month'].isin(months)]
+
+    ## filter selected days
+    if days:
+        df = df[df['day_of_week'].isin(days)]
 
     #view filtered data
-    view_filtered_df = input(f"\nWould you like to see the filtered data from {city.title()} (Yes or No):\n").lower().strip()
+    view_filtered_df = input(f"\nWould you like to see the filtered data from\n{' AND '.join(str(c).title() for c in cities)}\n{' AND '.join(str(m).title() for m in months)}\n{' AND '.join(str(d).title() for d in days)}\n(Yes or No):\n").lower().strip()
     if(view_filtered_df in ['yes', 'y']):
         print_dataframe_chunks(df)
     return df
@@ -444,7 +444,7 @@ def main():
         print(f"Selected months: {cities}")
         days = get_user_inputs("day of the week", config.DAYS)
         print(f"Selected days: {cities}")
-        df = load_data(cities, months, days)
+        df = load_data(cities, months, days, config.CITY_DATA)
         time_stats(df)
         station_stats(df)
         trip_duration_stats(df)

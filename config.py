@@ -1,5 +1,11 @@
 # config.py
 
+# City data files
+CITY_DATA = { 'chicago': 'chicago.csv',
+              'new york city': 'new_york_city.csv',
+              'washington': 'washington.csv'
+}
+
 # Valid cities with common misspellings and alternatives
 CITIES = {
     "chicago": ["chicago", "chitown", "chigaco", "chcago", "chigago", "chciago"],
