@@ -390,7 +390,7 @@ def user_stats(df, city):
         max_yob = pd.to_numeric(df['Birth Year'].dropna()).astype('Int64').min()
         min_yob = pd.to_numeric(df['Birth Year'].dropna()).astype('Int64').max()
         mode_yob = pd.to_numeric(df['Birth Year'].dropna()).astype('Int64').mode().iloc[0]
-        print(f"The older rider(s) was born in: {max_yob}")
+        print(f"The oldest rider(s) was born in: {max_yob}")
         print(f"The youngest rider(s) was born in: {min_yob}")
         print(f"The most common year of birth was: {mode_yob}")
     else:
