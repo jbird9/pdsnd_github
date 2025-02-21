@@ -51,6 +51,9 @@ After filtering, the program generates and displays statistics in the following 
     - Youngest rider(s)
     - Most common year of birth
 
+- **Restart**:
+  - User can restart the program (yes/no) and explore other filters
+
 #### Files Used
 - `chicago.csv`
 - `new_york_city.csv`
