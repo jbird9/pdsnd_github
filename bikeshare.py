@@ -1,6 +1,7 @@
 import time
 import pandas as pd
 import numpy as np
+import config
 
 CITY_DATA = { 'chicago': 'chicago.csv',
               'new york city': 'new_york_city.csv',
@@ -16,6 +17,41 @@ def check_valid_input(user_input, valid_answers, common_alternatives):
         print(f"We assume you mean {corrected_input.title()}")
         return True, corrected_input
     return False, user_input
+
+def get_user_inputs(input_type, valid_options):
+    """
+    Allows the user to enter multiple values (e.g., days or months) and collects them in a list.
+    If no input is provided, defaults to all options.
+    """
+    inputs = []
+    prompt = f"Please enter one {input_type} at a time (e.g., {list(valid_options.keys())[0]}), or type 'done' to finish. Press Enter to select all: "
+    print(prompt)
+
+    while True:
+        user_input = input(f"Enter a {input_type}, or type 'done' to finish: ").lower().strip()
+        if user_input == 'done' or user_input == '':
+            if not inputs:  # No inputs collected, default to all
+                inputs = list(valid_options.keys())
+                print(f"All {input_type}s have been selected.")
+            break
+
+        # Check each possible key and its synonyms in the dictionary
+        found = False
+        for key, synonyms in valid_options.items():
+            if user_input in synonyms:
+                if key not in inputs:
+                    inputs.append(key)
+                    print(f"{key.title()} added. You can add more or type 'done' to finish.")
+                else:
+                    print(f"{key.title()} is already added. Please enter another or type 'done'.")
+                found = True
+                break
+
+        if not found and user_input:
+            print(f"Invalid {input_type}. Please try again using valid options.")
+
+    return inputs
+
 
 def find_indices_sublist(main_list, sublist):
     """Find indices of each unique item in the sublist within the main list."""
@@ -401,8 +437,14 @@ def user_stats(df, city):
 
 def main():
     while True:
-        city, month, day = get_filters()
-        df = load_data(city, month, day)
+#        city, month, day = get_filters()
+        cities = get_user_inputs("city", config.CITIES)
+        print(f"Selected cities: {cities}")
+        months = get_user_inputs("month", config.MONTHS)
+        print(f"Selected months: {cities}")
+        days = get_user_inputs("day of the week", config.DAYS)
+        print(f"Selected days: {cities}")
+        df = load_data(cities, months, days)
         time_stats(df)
         station_stats(df)
         trip_duration_stats(df)
