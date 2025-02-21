@@ -56,5 +56,10 @@ After filtering, the program generates and displays statistics in the following 
 - `new_york_city.csv`
 - `washington.csv`
 
+#### Dependencies
+- time
+- pandas
+- numpy
+
 #### Credits
 Credit is given to the Udacity Programming for Data Science with Python course materials for the foundational concepts and data used in this program.
