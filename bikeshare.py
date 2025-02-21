@@ -17,7 +17,7 @@ def get_user_inputs(input_type, valid_options):
         if user_input == 'done' or user_input == '':
             if not inputs:  # No inputs collected, default to all
                 inputs = list(valid_options.keys())
-                print(f"All {input_type}s have been selected.")
+                print(f"All options have been selected.")
             break
 
         # Check each possible key and its synonyms in the dictionary
@@ -72,15 +72,16 @@ def load_data(cities, months, days, CITY_DATA_FILES):
     # load data file into a dataframe
     dfs = []
     for city in cities:
+        # Handle missing gender and birth year data if Washington is selected
+        if city == 'washington':
+            df['Gender'] = np.nan
+            df['Birth Year'] = np.nan
         if city in CITY_DATA_FILES:
-            # load data from a city
+        # load data from a city
             df = pd.read_csv(CITY_DATA_FILES[city])
-
-            # Handle missing gender and birth year data if Washington is selected
-            if city == 'Washington':
-                df['Gender'] = np.nan
-                df['Birth Year'] = np.nan
             dfs.append(df)
+    
+    df = pd.concat(dfs, ignore_index=True)
 
     # convert the Start Time column to datetime
     df['Start Time'] = pd.to_datetime(df['Start Time'])
