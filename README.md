@@ -7,16 +7,20 @@ This program allows users to explore data from the bikeshare service Motivate, f
 
 - **City Selection**:
   - Choose from three cities: Chicago, New York City, or Washington.
+  - Select a specific city or cities by typing out the city name and pressing enter after each.
+  - Complete the selection by typing 'done' and pressing enter.
+  - Enter 'done' without any prior month selection defaults to all months.
+
 
 - **Month Filter**:
   - Select specific months by typing out the month name and pressing enter after each.
   - Complete the selection by typing 'done' and pressing enter.
-  - Typing 'done' without any prior month selection defaults to all months.
+  - Typing 'done' or just pressing enter without any prior month selection defaults to all months.
 
 - **Day Filter**:
   - Select specific days by typing out the day names one at a time.
   - Complete the selection by typing 'done' and pressing enter.
-  - Typing 'done' without any prior day selection defaults to all days.
+  - Typing 'done' or just pressing enter without any prior day selection defaults to all days.
 
 - **Raw Data Viewing**:
   - Respond 'Yes' to view every line of the selected city's data, displayed five entries at a time.
@@ -58,6 +62,7 @@ After filtering, the program generates and displays statistics in the following 
 - `chicago.csv`
 - `new_york_city.csv`
 - `washington.csv`
+- `config.py`
 
 #### Dependencies
 - time
