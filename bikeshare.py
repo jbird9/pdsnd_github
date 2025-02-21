@@ -81,7 +81,7 @@ def load_data(cities, months, days, CITY_DATA_FILES):
             df = pd.read_csv(CITY_DATA_FILES[city])
             dfs.append(df)
     
-    df = pd.concat(dfs, ignore_index=True)
+    df = pd.concat(dfs, ignore_index=True, sort=True)
 
     # convert the Start Time column to datetime
     df['Start Time'] = pd.to_datetime(df['Start Time'])
