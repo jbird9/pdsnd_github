@@ -9,7 +9,7 @@ def get_user_inputs(input_type, valid_options):
     If no input is provided, defaults to all options.
     """
     inputs = []
-    prompt = f"Please enter one {input_type} at a time ({", ".join(list(valid_options.keys())).title()}) or type 'done' to finish. Press Enter to select all: "
+    prompt = f"Please enter one {input_type} at a time ({', '.join(list(valid_options.keys())).title()}) or type 'done' to finish. Press Enter to select all: "
     print(prompt)
 
     while True:
@@ -226,14 +226,13 @@ def user_stats(df, cities):
 
 def main():
     while True:
-#        city, month, day = get_filters()
         print('Hello! Let\'s explore some US bikeshare data!')
         cities = get_user_inputs("city", config.CITIES)
-        print(f"Selected cities: {" ".join(cities).title()}")
+        print(f"Selected cities: {' '.join(cities).title()}")
         months = get_user_inputs("month", config.MONTHS)
-        print(f"Selected months: {" ".join(months).title()}")
+        print(f"Selected months: {' '.join(months).title()}")
         days = get_user_inputs("day of the week", config.DAYS)
-        print(f"Selected days: {" ".join(days).title()}")
+        print(f"Selected days: {' '.join(days).title()}")
         df = load_data(cities, months, days, config.CITY_DATA)
         time_stats(df)
         station_stats(df)
