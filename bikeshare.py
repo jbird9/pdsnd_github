@@ -3,24 +3,13 @@ import pandas as pd
 import numpy as np
 import config
 
-def check_valid_input(user_input, valid_answers, common_alternatives):
-    """Checks if inputs are valid and coverts to alternatives if neccessary"""
-    if user_input.lower() in valid_answers:
-        return True, user_input
-    #check if user input is one of the common alternative or misspelled names
-    if user_input.lower() in common_alternatives:
-        corrected_input = common_alternatives[user_input.lower()]
-        print(f"We assume you mean {corrected_input.title()}")
-        return True, corrected_input
-    return False, user_input
-
 def get_user_inputs(input_type, valid_options):
     """
     Allows the user to enter multiple values (e.g., days or months) and collects them in a list.
     If no input is provided, defaults to all options.
     """
     inputs = []
-    prompt = f"Please enter one {input_type} at a time (e.g., {list(valid_options.keys())[0]}), or type 'done' to finish. Press Enter to select all: "
+    prompt = f"Please enter one {input_type} at a time ({", ".join(list(valid_options.keys())).title()}) or type 'done' to finish. Press Enter to select all: "
     print(prompt)
 
     while True:
@@ -48,22 +37,6 @@ def get_user_inputs(input_type, valid_options):
 
     return inputs
 
-def find_indices_sublist(main_list, sublist):
-    """Find indices of each unique item in the sublist within the main list."""
-    indices_list = []
-    for item in sublist:
-        try:
-            index = main_list.index(item)
-            indices_list.append(index)
-        except ValueError:
-            indices_list.append(None)  # Append None if the item is not found
-    return indices_list
-
-# Function to convert 0 to 1 based indices
-def convert_to_1_based_indices(indices_list):
-    """Moves each value of list of integers up by 1"""
-    return [index + 1 if index is not None else None for index in indices_list]
-
 # Function to print data 5 rows at a time
 def print_dataframe_chunks(df,chunk_size=5):
     """Prints out data five rows at a time"""
@@ -75,25 +48,6 @@ def print_dataframe_chunks(df,chunk_size=5):
         if user_input in ['no','n']:
             print("Exiting")
             break
-
-# Translate month index to month name
-def translate_month_index_name(month_index):
-    """Formats index as month name"""
-    if 1 <= month_index <= 12:
-        # Create a Timestamp for first monday of the year
-        timestamp = pd.Timestamp(year=2017, month=month_index, day=1)
-        month_name = timestamp.strftime('%B')  # get month name
-        return month_name
-    
-# Translate day of week index to dow name
-def translate_dow_index_name(dow_index):
-    """Formats index as name of the day of the week"""
-    if 0 <= dow_index <= 7:
-        # Create a Timestamp for the first of the month
-        first_monday = pd.Timestamp("2017-01-02")
-        date_offset = first_monday + pd.Timedelta(days=dow_index)
-        day_name = date_offset.strftime('%A')  # get day name
-        return day_name
     
 # Translate 24 hour index to 12 hour time
 def translate_24hr_index_to_12hr_time(hour_index):
@@ -103,174 +57,6 @@ def translate_24hr_index_to_12hr_time(hour_index):
         timestamp = pd.Timestamp.today().replace(hour=hour_index, minute=0, second=0, microsecond=0)
         time_12hr = timestamp.strftime('%I:%M %p')
         return time_12hr
-
-def get_filters():
-    """
-    Asks user to specify a city, month, and day to analyze.
-
-    Returns:
-        (str) city - name of the city to analyze
-        (str) month - name of the month to filter by
-        (str) day - name of the day of week to filter by
-    """
-    print('Hello! Let\'s explore some US bikeshare data!')
-    # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
-    
-    user_city = ""
-    city = ""
-    valid_city = ["chicago","new york city","washington"]
-    common_city_alternatives = {
-        "chitown": "chicago",
-        "new york": "new york city",
-        "nyc": "new york city",
-        "dc": "washington",
-        "washington d.c.": "washington",
-        "washington dc": "washington",
-        "chigaco": "chicago",
-        "chcago": "chicago",
-        "chigago": "chicago",
-        "chciago": "chicago",
-        "new yrok city": "new york city",
-        "new yourk city": "new York City",
-        "new yor city": "new York City",
-        "washinton": "washington",
-        "washingotn": "washington",
-        "washngton": "washington",
-        "wahsington": "washington"
-    }
-    is_valid_city = False
-    while not is_valid_city:
-        #have the user input is one of the cities for which we have data
-        user_city = input("\nWhich city's data would you like to explore (Chicago, New York City, or Washington)\n").lower().strip()
-        is_valid_city, corrected_city = check_valid_input(user_city, valid_city, common_city_alternatives)
-        if not is_valid_city:
-            print("\nPlease input the name one of these cities (Chicago, New York City, or Washington).\n")
-        else:
-            city = corrected_city
-            print("Thank you!")
-            
-    print(f"You selected: {city.title()}")
-    # get user input for month (all, january, february, ... , june)
-    user_month = "" #initialize variables
-    valid_month = ["january","february","march","april","may","june"]
-    common_month_alternatives = {
-        "janury": "january",
-        "januray": "january",
-        "janaury": "january",
-        "janauary": "january",
-        "jan": "january",
-        "feburary": "february",
-        "febuary": "february",
-        "febrary": "february",
-        "februray": "february",
-        "febraury": "february",
-        "feb": "february",
-        "marh": "march",
-        "mrach": "march",
-        "mach": "march",
-        "mar": "march",
-        "aprl": "april",
-        "apirl": "april",
-        "aprile": "april",
-        "apr": "april",
-        "mai": "may",
-        "mey": "may",
-        "jue": "june",
-        "jun": "june",
-        "juin": "mune"
-    }
-    month = ["january","february","march","april","may","june"]
-    selected_month = []
-    print("You may choose to narrow the data down to a month or months")
-    print("Not selecting any month will default to using data across all months")
-    while True:
-        user_month = input("\nType a month and hit enter\n(January, February, March, April, May, or June).\nType 'done' to finish selecting month(s).)\n").lower().strip()
-        if user_month == 'done':
-            break
-        is_valid_month, corrected_month = check_valid_input(user_month, valid_month, common_month_alternatives)
-        if not is_valid_month:
-            print("\nPlease pick from these months?\n(January, February, March, April, May, or June).\n")
-        else:
-            selected_month.append(corrected_month)
-            print("\nThank you! Would you like to select another month?\n")
-    if selected_month:
-        month = selected_month
-    print(f"You selected: {' '.join(month).title()}")
-
-    # get user input for day of week (all, monday, tuesday, ... sunday)
-    day = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
-    user_day = ""
-    selected_day = []
-    valid_day = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"]
-    common_day_alternatives = {
-        "monady": "monday",
-        "mondy": "monday",
-        "munday": "monday",
-        "monay": "monday",
-        "mon": "monday",
-        "mo": "monday",
-        "m": "monday",
-        "tusday": "tuesday",
-        "tuseday": "tuesday",
-        "tuesady": "tuesday",
-        "tuesdy": "tuesday",
-        "tues": "tuesday",
-        "tu": "tuesday",
-        "wensday": "wednesday",
-        "wedensday": "wednesday",
-        "wednsday": "wednesday",
-        "wendsday": "wednesday",
-        "wed": "wednesday",
-        "we": "wednesday",
-        "w": "wednesday",
-        "thrusday": "thursday",
-        "thurday": "thursday",
-        "thursady": "thursday",
-        "thurdsay": "thursday",
-        "thurs": "thursday",
-        "thur": "thursday",
-        "thu": "thursday",
-        "th": "thursday",
-        "firday": "friday",
-        "fridy": "friday",
-        "firady": "friday",
-        "fryday": "friday",
-        "fri": "friday",
-        "fr": "friday",
-        "saterday": "saturday",
-        "satuday": "saturday",
-        "satrday": "saturday",
-        "saturdy": "saturday",
-        "sat": "saturday",
-        "sa": "saturday",
-        "sundy": "sunday",
-        "sundey": "sunday",
-        "sunady": "sunday",
-        "sundday": "sunday",
-        "sund": "sunday",
-        "sun": "sunday",
-        "su": "sunday"
-    }
-    print("You may choose to narrow the data down to a day or days of the week")
-    print("Not selecting any day will default to using data across all days of the week")
-    while True:
-        user_day = input("\nType a day and hit enter\n(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, or Sunday).\nType 'done' to finish selecting day(s))\n").lower().strip()
-        if user_day == 'done':
-            break
-        is_valid_day, corrected_day = check_valid_input(user_day, valid_day, common_day_alternatives)
-        if not is_valid_day:
-            print("\nPlease pick from these days?\n(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, or Sunday).")
-        else:
-            selected_day.append(corrected_day)
-            print("\nThank you! Would you like to select another day?\n")
-    if selected_day:
-        day = selected_day
-    print(f"\nYou selected: {' '.join(day).title()}\n")
-
-    print('-'*40)
-    return city, month, day
-
-
 
 def load_data(cities, months, days, CITY_DATA_FILES):
     """
@@ -440,6 +226,7 @@ def user_stats(df, cities):
 def main():
     while True:
 #        city, month, day = get_filters()
+        print('Hello! Let\'s explore some US bikeshare data!')
         cities = get_user_inputs("city", config.CITIES)
         print(f"Selected cities: {" ".join(cities).title()}")
         months = get_user_inputs("month", config.MONTHS)
